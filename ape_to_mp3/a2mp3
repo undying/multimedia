@@ -1,0 +1,28 @@
+#! /bin/bash
+
+S_DIR="$1"
+O_DIR="$2"
+
+find "$S_DIR" -iname "*.ape" | while read file;do
+	echo file = "$file"
+	MPG="$(echo "$file" | sed -e 's:.*/\(.*\)\.ape$:\1:').mp3"
+	echo mp3 = "$MPG"
+	o_dir="$O_DIR$(echo "$file" | sed -e 's/^\.//' -e 's:\(/.*\)/.*ape$:\1:')"
+	echo o_dir = "$o_dir"
+	[ ! -d "$o_dir" ] && mkdir -p "$o_dir"
+	echo out dir = "$o_dir"
+	filename=$(echo "$file" | sed -e 's:.*/\(.*\)\.ape$:\1:')
+	echo filename = "$filename"
+	echo file = "$file"
+	cue="$(echo $file | sed -e 's:\(.*\)\.ape$:\1:').cue"
+	echo cue = "$cue"
+	mac "$file" "$o_dir/$filename.wav" -d
+	#bchunk -vw "$o_dir/$filename.wav" "$cue" "$o_dir/$filename"
+	lame -h --cbr -b 320 "$o_dir/$filename.wav" "$o_dir/$filename.mp3"
+	mp3splt -a -c "$cue" "$o_dir/$filename.mp3"
+	if [ $? -eq 0 ];then
+		rm "$o_dir/$filename.wav"
+		rm "$o_dir/$filename.mp3"
+	fi
+done
+
