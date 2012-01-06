@@ -1,0 +1,57 @@
+#! /bin/bash
+
+#if [[ $# -ne 1 && $# -ne 2 ]];then
+#	echo ERROR: you should use this script like $0 PATH_TO_FLAC PATH_TO_NEW-MADED_MP3
+#	exit
+#	fi
+
+# Help begining
+if [[ "$*" == "help" || "$*" == "--help" ]];then
+	echo -e \\tFLAC to MP3 converter
+	echo -e \\tThis script depends on the "lame" and "flac" bins, so probably you should install them before using this script
+	echo 
+	echo -e \\t\\tUsage: $0 [PATH_TO_FLAC] [PATH_TO_MP3]
+	echo -e \\tWhere is:
+	echo -e \\t[PATH_TO_FLAC] - path where the FLAC files are stored
+	echo -e \\t[PATH_TO_MP3] path/name of the dirictory where the mp3 will be stored
+	exit
+else
+	echo -e "\tTo see help, run it with "--help" key ($0 --help)\n"
+	fi
+# Help ends
+
+# For case if there is no arguments are given
+if [ -z "$1" ];then
+
+	F_DIR="$PWD"
+else
+	F_DIR="$1"
+	fi
+
+
+if [ -z "$2" ];then
+
+	M_DIR="$PWD/mp3"
+else
+	M_DIR="$2"
+	fi
+#
+
+
+# Making a directory tree for new files
+find "$F_DIR" -iname '*.flac' | sed 's:\(.*\)\(/.*flac$\):\1:g' | uniq | while read F_DIR;do
+	mkdir -p "$M_DIR/$F_DIR"
+	done
+#
+
+# Converting FLAC to MP3
+find "$F_DIR" -iname '*.flac' | while read FLAC;do
+	MPG=$(echo "$FLAC" | sed -e 's:\(.*/\)\(.*flac\):\2:g' -e 's:\(.*\)\(flac\):\1mp3:g')
+	echo "$MPG"
+	O_DIR=$(echo "$FLAC" | sed -e 's:\(.*/\)\(.*flac\):\1:g')
+	echo "$O_DIR"
+	echo "$FLAC"
+	cat "$FLAC" | flac -d -c - | lame -h --cbr -b 320 - "$M_DIR/$O_DIR/$MPG"
+	done
+#
+
