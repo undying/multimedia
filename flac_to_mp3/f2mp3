@@ -51,7 +51,7 @@ find "$F_DIR" -iname '*.flac' | while read FLAC;do
 	O_DIR=$(echo "$FLAC" | sed -e 's:\(.*/\)\(.*flac\):\1:g')
 	echo "$O_DIR"
 	echo "$FLAC"
-	cat "$FLAC" | flac -d -c - | lame -h --cbr -b 320 - "$M_DIR/$O_DIR/$MPG"
+	cat "$FLAC" | flac -d -c - | lame -h -V0 --vbr-new - "$M_DIR/$O_DIR/$MPG"
 	done
 #
 
